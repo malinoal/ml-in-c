@@ -2,16 +2,13 @@
 #include <stdio.h>
 
 #include "random.h"
+#include "perceptron.h"
+#include "math.h"
 
-typedef struct {
-  int num_inputs;
-  double* input_weights;
-  double bias;
-  double learning_rate;
-} perceptron;
 
 perceptron create_perceptron(int num_inputs, double learning_rate) {
-  double* input_weights = calloc(num_inputs, sizeof(double));
+  double* input_weights = calloc(num_inputs, sizeof(double)); 
+  for (int i = 0; i < num_inputs; i++) input_weights[i] = rndm(1); //TODO: initialize from normal distribution
   double bias = rndm(1);
   perceptron result = { num_inputs, input_weights, bias, learning_rate};
   return result;
@@ -21,25 +18,18 @@ void free_perceptron(perceptron input) {
   free(input.input_weights);
 }
 
-double evaluate_perceptron(perceptron neuron, int input_size, double* input) {
+double evaluate_perceptron(perceptron neuron, double* input) {
   double result = 0;
-  for (int i = 0; i < input_size; i++) result += neuron.input_weights[i] * input[i];
+  for (int i = 0; i < neuron.num_inputs; i++) result += neuron.input_weights[i] * input[i];
   result += neuron.bias;
   return result;
 }
 
-double sign(double x) {
-  return x > 0 ? 1 : -1;
-}
 
-double max(double a, double b) {
-  return a > b ? a : b;
-}
-
-double train_perceptron(perceptron* neuron, int input_size, double* input, double truth) {
-  double result = evaluate_perceptron(*neuron, input_size, input);
+double train_perceptron(perceptron* neuron, double* input, double truth) {
+  double result = evaluate_perceptron(*neuron, input);
   if (sign(result) != truth) {
-    for (int i = 0; i < input_size; i++)
+    for (int i = 0; i < neuron->num_inputs; i++)
       neuron->input_weights[i] =
 	  neuron->input_weights[i] + neuron->learning_rate * input[i] * truth;
     neuron->bias = neuron->bias + neuron->learning_rate * truth;
@@ -51,7 +41,7 @@ double simple_binary_truth(double x, double y) {
   return sign(y - 2*x);
 }
 
-int main(void) {
+void test_perceptron() {
   int num_iterations = 100000;
   perceptron neuron = create_perceptron(2, 0.1);
 
@@ -65,7 +55,7 @@ int main(void) {
     double y = rndm(100);
     double input[] = {x, y};
     double truth = simple_binary_truth(x, y);
-    double result = train_perceptron(&neuron, 2, input, truth);
+    double result = train_perceptron(&neuron, input, truth);
     double error = max(0, (-1 * result) * truth);
     if (error > 0) false++; else correct++;
     total_error += error;
