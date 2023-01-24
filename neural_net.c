@@ -22,8 +22,8 @@ double forward(double *input, Layer layer) {
   return result;
 }
 
-double backprop(double* gradient, Layer layer) {
-}
+//double backprop(double* gradient, Layer layer) {
+//}
 
 double adjust(perceptron neuron, double* gradient) {
 }

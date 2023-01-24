@@ -12,7 +12,7 @@ typedef struct _layer {
 
 
 double forward(double *input, Layer layer);
-double backprop(double* gradient, Layer layer);
+//double backprop(double* gradient, Layer layer);
 double adjust(perceptron neuron, double* gradient);
 
 #endif
